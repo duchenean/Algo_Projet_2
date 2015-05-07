@@ -8,7 +8,7 @@ import java.util.Arrays;
  * Created by Antoine on 07/05/2015.
  */
 public class Person implements Comparable {
-    private int balance;
+    private double balance = 0;
     private int id;
     private static ArrayList<Integer> usedIDs = new ArrayList<Integer>();
 
@@ -23,6 +23,14 @@ public class Person implements Comparable {
         } else {
             throw new AlreadyExistingIDException(id);
         }
+    }
+
+    public void debit(double value){
+        this.balance = balance-value;
+    }
+
+    public void charge(double value){
+        this.balance = balance+value;
     }
 
 
@@ -58,11 +66,11 @@ public class Person implements Comparable {
         return id + ": " + balance;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 
