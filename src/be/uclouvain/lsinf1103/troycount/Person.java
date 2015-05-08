@@ -1,8 +1,8 @@
 package be.uclouvain.lsinf1103.troycount;
 
 import be.uclouvain.lsinf1103.exceptions.AlreadyExistingIDException;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 public class Person implements Comparable {
@@ -10,25 +10,17 @@ public class Person implements Comparable {
     private int id;
     private static ArrayList<Integer> usedIDs = new ArrayList<Integer>();
 
-    private Person(int id) {
-        this.id=id;
+    public Person(int id) {
+        this.id = id;
         usedIDs.add(id);
     }
 
-    public static Person createPerson(int id) {
-        if (!usedIDs.contains(id)){
-            return new Person(id);
-        } else {
-            throw new AlreadyExistingIDException(id);
-        }
+    public void balanceSub(double value) {
+        this.balance = balance - value;
     }
 
-    public void debit(double value){
-        this.balance = balance-value;
-    }
-
-    public void charge(double value){
-        this.balance = balance+value;
+    public void balanceAdd(double value) {
+        this.balance = balance + value;
     }
 
 
@@ -43,7 +35,7 @@ public class Person implements Comparable {
 
     @Override
     public int compareTo(Object obj) {
-        if (obj == null){
+        if (obj == null) {
             return 0;
         }
         if (obj instanceof Person) {
@@ -68,15 +60,9 @@ public class Person implements Comparable {
         return balance;
     }
 
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
 }
