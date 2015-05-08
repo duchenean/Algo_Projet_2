@@ -4,7 +4,7 @@
 \usepackage[francais]{babel}
 \usepackage{textcomp}
 \usepackage{mathtools,amssymb,amsthm}
-\usepackage[left = 2cm, top = 2cm, right = 2cm, bottom = 2.5 cm, headheight = 0pt]{geometry}
+\usepackage[left = 2cm, top = 1.33cm, right = 2cm, bottom = 2.3 cm, headheight = 0pt]{geometry}
 \usepackage{graphicx}
 \usepackage{pgf, tikz}
 	\usetikzlibrary{arrows,shapes,positioning}
@@ -87,31 +87,80 @@
 
 
 \begin{Large} \begin{center}
+\vspace{-0.83cm}
 \noindent \rule{15cm}{.9pt} 
 \vspace{-0.33cm}
 	\textsf{Mini-projet 2 -  Conception d’algorithme : Troycount}\\
 	\rule{15cm}{.9pt} 
 \end{center} \end{Large} 
-
+\vspace{-0.7cm}
 \section{Explication de l'algorithme}
+\vspace{-0.3cm}
+\subsection{Procédure}
+\begin{enumerate}
+\item Créer un tableau de personne (Voir figure 2)
+\item Ordonner ce tableau en fonction de la balance financière de chaque personne
+\item Séparer le tableau en 2
+\begin{itemize}
+\item Personnes ayant une balance positive (= débiteurs)
+\item Personnes ayant une balance négative (= créanciers) \medskip \\
+NB: Les personnes ayant une balance nulle sont enlevées (Elle ne doivent pas \\ donner/recevoir d'argent)
+\end{itemize}
+\item Parcourir le tableau de débiteurs et de créanciers
+\item A chaque itération, effectuer les transactions appropriées (Voir 1.2 gestion des transactions)
+\end{enumerate}
+
+\noindent \begin{minipage}{0.5 \textwidth}
 \begin{center}
-\vspace{1cm}
-	\includegraphics[width = 8.5cm]{sch}
+\includegraphics[scale=0.33]{sch}
+\captionof{figure}{Création des transactions}
+\label{image-tigre}
 \end{center}
+\end{minipage}
+\begin{minipage}{0.5 \textwidth}
+\begin{center}
+\includegraphics[scale=0.33]{per2}
+\captionof{figure}{Objet "personne"}
+\label{image-tigre}
+\end{center}
+\end{minipage}
+\subsection{Gestion des transactions}
+\noindent Afin de gérer les transactions, les 2 tableaux sont parcourus simultanément (personnes créancières et personnes débitrices) 
+\smallskip \\
+\noindent \textbf{Fonctionnement}
 
-\newpage
+\begin{enumerate}
+\item Commencer au début de chaque tableau
+\item Comparer le débiteur actuel avec le créancier actuel; 2 situations :
+\begin{enumerate}
+\item le débiteur actuel peut rembourser intégralement le créancier actuel
+\begin{enumerate}
+\item Le débiteur lui verse toute la créance
+\item Passer au créancier suivant 
+\end{enumerate} 
+\item le débiteur ne peut rembourser intégralement le créancier actuel
+\begin{enumerate}
+\item Le débiteur lui verse toute sa dette
+\item Passer au débiteur suivant 
+\end{enumerate} 
+\end{enumerate}
+\item Recommencer l'étape 2 jusqu'à la fin des tableaux
+\end{enumerate}
+ \footnotesize{NB: Les transactions sont stockées au fur et à mesure dans une pile. Celle-ci et ensuite retournée sous forme d'un tableau }
 
-\fontfamily{phv}\selectfont
-\section{Choix d'implémentation}
-Afin d'implémenter l'arbre syntaxique abstrait, nous avons utilisé une structure chainée. Ce type d'implémentation a été préféré à un tableau dynamique car la complexité spatial avec un tableau est de $\mathbf{\Theta (2^{n})}$ alors qu'avec une structure chainée la complexité spacial est de $\mathbf{\Theta (n)}$.
-\medskip
 
-De plus, une structure chainée était un choix obligatoire vu la contrainte d'utiliser des méthodes récursives.
+
+
+
+
+
+
 \vspace{-6pt}
 \section{Complexité des différentes méthodes}
-\noindent Soit n, le nombre d'opérations et de nombres : n représente donc la taille du problème à résoudre.
+\normalsize
+\noindent Soit n, le nombre de personnes : n représente donc la taille du problème à résoudre.
 \vspace{-6pt}
-\subsection{TreeBuilderIF.build()}
+\subsection{Troycount.balance()}
 \noindent Complexité temporelle en $\mathbf{\Theta (n)}$ car :
 
 \begin{enumerate}
@@ -121,7 +170,7 @@ De plus, une structure chainée était un choix obligatoire vu la contrainte d'u
 
 \noindent On en déduit donc que le temps d'exécution augmentera de façon linéaire par rapport à la taille du problème.
 
-\subsection{ExprIF.getReducedTree()}
+\subsection{Troycount.generateTabPerson}
 \noindent Complexité temporelle en $\mathbf{\mathcal{O}(}\mathbf{log (n))}$ car :
 \begin{enumerate}
 	\item Complexité temporelle en $\mathbf{\mathcal{O}(h)}$, où h est la hauteur de l’arbre
@@ -136,21 +185,9 @@ Donc,
 
 
 
-\subsection{ExprIF.toString()}
-\noindent Complexité temporelle en $\mathbf{\mathcal{O}(n)}$ car on passe, dans le pire des cas, 3x par chaque noeud de l'arbre (parcours d'Euler). On a donc une complexité en  $\mathbf{\mathcal{O}(3n)}$. On peut "simplifier" le 3 car il s'agit d'une constante. On obtient donc $\mathbf{\mathcal{O}(n)}$  
+\section{Choix d'implémentation}
 
-\begin{itemize}
-	\item Meilleur cas : $\mathbf{\Theta (1)}$ (L'arbre est entièrement simplifié)
-	\item Pire cas : $\mathbf{\Theta(n)}$
-	\item En général : $\mathbf{\mathcal{O}(n)}$
-\end{itemize}
-
-
-\section{Difficultés rencontrées}
-\begin{itemize}
-	\item Quelques difficultés à implémenter une méthode récursive
-	\item Choix d'implémentations
-\end{itemize}
+Afin d'implémenter notre algorithme nous avons utilisé la programmation orienté objet; Une classe "personne" a été créer afin de gérer plus facilement les créances et dettes de chaque personne. De plus, cette classe "personne" implémente l'interface "Comparable" ce qui permet de trier facilement les créanciers et les débiteurs. 
 
 
 
