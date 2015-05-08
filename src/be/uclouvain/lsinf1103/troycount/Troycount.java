@@ -1,10 +1,8 @@
 package be.uclouvain.lsinf1103.troycount;
 
 import java.io.*;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
-import be.uclouvain.lsinf1103.troycount.Person;
+
 
 /**
  * Représente une liste de dépenses effectuées par un groupe de personnes.
@@ -83,41 +81,81 @@ public class Troycount {
 	 * au plus deux chiffres après la virgule.
 	 */
 	public Transaction[] balance(){
-		Person[] person = generateTabPerson();
-		Arrays.sort(person);
-		System.out.println(Arrays.toString(person));
-		Transaction[] transaction = new Transaction[person.length];
-		int i = 0;
-		int j = person.length-1;
-		int k = 0;
-		while (i<person.length-2 && j>=0){
-			if (person[i].getBalance()<=-person[j].getBalance()){
-				transaction[k] = new Transaction(person[i].getId(),person[j].getId(),person[i].getBalance());
-				person[j].charge(person[i].getBalance());
-				person[i].debit(person[i].getBalance());
-				i++;
-				k++;
-				if (person[j].getBalance()==0){
-					j--;
-				}
-			}  else {
-				transaction[k] = new Transaction(person[i].getId(),person[j].getId(),-person[j].getBalance());
-				person[i].debit(-person[j].getBalance());
-				person[j].charge(-person[j].getBalance());
-				j--;
-				k++;
-				if (person[i].getBalance()==0){
-					i++;
-				}
+		Person[] persons = generateTabPersons();
+		Arrays.sort(persons);
+
+		int firstSplitIndex = 0;
+		int secondSplitIndex = 0;
+
+		for (int i = 0; persons[i].getBalance()>=0; i++) {
+			secondSplitIndex++;
+			if (persons[i].getBalance()>0){
+				firstSplitIndex++;
 			}
-		}		System.out.println(Arrays.toString(transaction));
-		return transaction;
+		}
+
+		Person[] debtors = Arrays.copyOfRange(persons,0,firstSplitIndex);
+		Person[] creditors = Arrays.copyOfRange(persons, secondSplitIndex, persons.length);
+
+		System.out.println(Arrays.toString(persons)+"\n");
+		System.out.println(Arrays.toString(debtors));
+		reverse(creditors);
+		System.out.println(Arrays.toString(creditors));
+
+		Stack<Transaction> transactions = new Stack<Transaction>();
+
+
+		int i,j = 0;
+
+
+
+
+//		Arrays.sort(person);
+//		System.out.println(Arrays.toString(person));
+//		Transaction[] transaction = new Transaction[person.length];
+//		int i = 0;
+//		int j = person.length-1;
+//		int k = 0;
+//		while (i<person.length-2 && j>=0){
+//			if (person[i].getBalance()<=-person[j].getBalance()){
+//				transaction[k] = new Transaction(person[i].getId(),person[j].getId(),person[i].getBalance());
+//				person[j].charge(person[i].getBalance());
+//				person[i].debit(person[i].getBalance());
+//				i++;
+//				k++;
+//				if (person[j].getBalance()==0){
+//					j--;
+//				}
+//			}  else {
+//				transaction[k] = new Transaction(person[i].getId(),person[j].getId(),-person[j].getBalance());
+//				person[i].debit(-person[j].getBalance());
+//				person[j].charge(-person[j].getBalance());
+//				j--;
+//				k++;
+//				if (person[i].getBalance()==0){
+//					i++;
+//				}
+//			}
+//		}		System.out.println(Arrays.toString(transaction));
+//		return transaction;
+		return null;
 	}
 
-	public Person[] generateTabPerson(){
-		Person[] tabPers = new Person[group_size];
+	public static Object[] reverse(Object[] o){
+		for (int i = 0; i < o.length / 2; i++) {
+			Object temp = o[i];
+			o[i] = o[o.length - 1 - i];
+			o[o.length - 1 - i] = temp;
+		}
+		return o;
+	}
+
+
+	public Person[] generateTabPersons(){
+		Person[] persons = new Person[group_size];
 		for (int i = 0; i < group_size; i++) {
-			tabPers[i] = Person.createPerson(i+1);
+			int personID = i+1;
+			persons[i] = Person.createPerson(personID);
 		}
 		for (Spending aSpending : spendings) {
 			int debitedPerson = aSpending.get_paid_by();
@@ -125,21 +163,17 @@ public class Troycount {
 			int chargedPersons = chargedPerson.length;
 			double spendingAmount = aSpending.get_amount();
 
-
 			for (int person : chargedPerson) {
 				double fixedCharge = aSpending.get_fixed_charges(person);
 				spendingAmount -= fixedCharge;
 			}
 
 			for (int person : chargedPerson) {
-				tabPers[person-1].charge(spendingAmount/chargedPersons);
+				persons[person-1].charge(spendingAmount / chargedPersons);
 			}
-			tabPers[debitedPerson-1].debit(spendingAmount);
-
-
+			persons[debitedPerson-1].debit(spendingAmount);
 		}
-
-		return tabPers;
+		return persons;
 	}
 
 	public int get_group_size() {
@@ -148,7 +182,7 @@ public class Troycount {
 
 	public static void main(String[] args) {
 		try {
-			Troycount troycount = new Troycount(new File("data/instance011.txt"));
+			Troycount troycount = new Troycount(new File("data/instance000.txt"));
 			troycount.balance();
 
 

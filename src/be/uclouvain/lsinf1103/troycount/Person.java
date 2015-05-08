@@ -4,9 +4,7 @@ import be.uclouvain.lsinf1103.exceptions.AlreadyExistingIDException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-/**
- * Created by Antoine on 07/05/2015.
- */
+
 public class Person implements Comparable {
     private double balance = 0;
     private int id;
@@ -80,22 +78,5 @@ public class Person implements Comparable {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public static void main(String[] args) {
-        Person a = createPerson(1);
-        Person b = createPerson(1);
-        Person c = createPerson(3);
-
-        a.setBalance(25);
-        b.setBalance(75);
-        c.setBalance(75);
-
-        Person[] tab = {a,b,c};
-
-        Arrays.sort(tab);
-
-        System.out.println(Arrays.toString(tab));
-
     }
 }
