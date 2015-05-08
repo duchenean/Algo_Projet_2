@@ -8,11 +8,9 @@ import java.util.ArrayList;
 public class Person implements Comparable {
     private double balance = 0;
     private int id;
-    private static ArrayList<Integer> usedIDs = new ArrayList<Integer>();
 
     public Person(int id) {
         this.id = id;
-        usedIDs.add(id);
     }
 
     public void balanceSub(double value) {

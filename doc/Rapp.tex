@@ -62,7 +62,7 @@
   commentstyle=\color{pgreen},
   keywordstyle=\color{pblue},
   stringstyle=\color{pred},
-  moredelim=[il][\textcolor{pgrey}]{$$},
+  moredelim=[il][\textcolor{pgrey}]{},
   moredelim=[is][\textcolor{pgrey}]{\%\%}{\%\%},
     numbers=left,
     numberstyle=\color{pgrey}, % the style that is used for the line-numbers
@@ -89,14 +89,14 @@
 \begin{Large} \begin{center}
 \noindent \rule{15cm}{.9pt} 
 \vspace{-0.33cm}
-	\textsf{Mini-projet 1 - Manipulation d'expressions arithmétiques}\\
+	\textsf{Mini-projet 2 -  Conception d’algorithme : Troycount}\\
 	\rule{15cm}{.9pt} 
 \end{center} \end{Large} 
 
-\section{Diagramme des classes}
+\section{Explication de l'algorithme}
 \begin{center}
 \vspace{1cm}
-	\includegraphics[width = 17cm]{diagramme}
+	\includegraphics[width = 8.5cm]{sch}
 \end{center}
 
 \newpage
@@ -157,89 +157,86 @@ Donc,
 \newpage
 \section*{Annexe}
 
-\subsection*{TreeBuilder}
+\subsection*{Troycount.balance()}
 
 \begin{lstlisting}[language=Java]
-public ExprIF build() {
-    Stack<Node> stack = new Stack<Node>();
-    for (int i = 0; i < exp.length(); i++) {
-        char currentChar = exp.charAt(i);
-        if (isDigit(currentChar)) {
-            StringBuilder number = new StringBuilder();
-            while (i < exp.length() && isDigit(exp.charAt(i))) {   //Tant que le nombre n'est pas fini
-                number.append(exp.charAt(i));
-                i++;
-            }
-            Node Node = new NumberNode(Double.parseDouble(number.toString()));
-            stack.push(Node);
+public Transaction[] balance() {
+    Person[] persons = generateTabPersons();
+    Arrays.sort(persons);
 
-        } else if (isOperation(currentChar)) {
+    int firstSplitIndex = 0;
+    int secondSplitIndex = 0;
 
-            Node Node = new OpNode(OpType.getOpType(currentChar));
-            stack.push(Node);
-
-        } else if (currentChar == ')') {
-            Node rightNode = stack.pop();
-            Node root = stack.pop();
-            Node leftNode = stack.pop();
-            root.setLeftNode(leftNode);
-            root.setRightNode(rightNode);
-            stack.push(root);
+    for (int i = 0; persons[i].getBalance() >= 0; i++) {
+    	secondSplitIndex++;
+    	if (persons[i].getBalance() > 0) {
+    		firstSplitIndex++;
         }
+     }
 
-    }
-    return new ExprTree(stack.pop()); // Retourne la racine de l'AST
-}\end{lstlisting}
-\medskip
-\subsection*{ExprIF}
-\begin{lstlisting}
-public String toString() {
-    String str = null;
-    if (root.getLeftNode() == null && root.getRightNode() == null) {
-        return root.toString();
-    } else if (root.getLeftNode() != null && root.getRightNode() != null) {
-        ExprTree LeftTree = new ExprTree(root.getLeftNode());
-        ExprTree RightTree = new ExprTree(root.getRightNode());
-        str = "(" + LeftTree.toString() + root.toString() + RightTree.toString() + ")";
-    }
-    return str;
+    Person[] debtors = Arrays.copyOfRange(persons, 0, firstSplitIndex);
+    Person[] creditors = Arrays.copyOfRange(persons, secondSplitIndex, persons.length);
+
+    reverse(creditors);
+
+    Stack<Transaction> transactions = new Stack<Transaction>();
+    int i = 0, j = 0;
+
+    while (i < debtors.length && j < creditors.length) {
+        if (debtors[i].getBalance() <= -creditors[j].getBalance()){
+            double transactionAmount = debtors[i].getBalance();
+            Transaction t = new Transaction(debtors[i].getId(),
+                                            creditors[j].getId(),
+                                            transactionAmount);
+            transactions.add(t);
+            System.out.println(t);
+            creditors[j].balanceAdd(transactionAmount);
+            debtors[i].balanceSub(transactionAmount);
+            i++;
+        } else {
+            double transactionAmount = -creditors[j].getBalance();
+            Transaction t = new Transaction(debtors[i].getId(),
+                                            creditors[j].getId(),
+                                            transactionAmount);
+            transactions.add(t);
+            System.out.println(t);
+            creditors[j].balanceAdd(transactionAmount);
+            debtors[j].balanceSub(transactionAmount);
+            j++;
+		}
+	}
+    return transactions.toArray(new Transaction[transactions.size()]);
 }
 \end{lstlisting}
 \newpage
+\subsection*{Troycount.generateTabPerson()}
 \begin{lstlisting}
-public ExprIF getReducedTree() {
-
-    if (getRoot().getLeftNode() != null && getRoot().getRightNode() != null) {
-        ExprTree subLeft = new ExprTree(root.getLeftNode());
-        ExprTree subRight = new ExprTree(root.getRightNode());
-        ExprTree eL = (ExprTree) subLeft.getReducedTree(); // Appel récursif
-        ExprTree eR = (ExprTree) subRight.getReducedTree(); // Appel récursif
-
-        if (getRoot() instanceof OpNode) {
-
-            if (((OpNode) getRoot()).isDirectlySolvable() && (!eL.isSimplified || !eR.isSimplified)) {
-                root = new NumberNode(root.eval());
-                isSimplified = true;
-                return this;
-            }
-        }
-
-        if (eL.isSimplified) {
-            this.getRoot().setLeftNode(eL.getRoot());
-            return new ExprTree(this.getRoot());
-        }
-
-        if (eR.isSimplified) {
-            this.getRoot().setRightNode(eR.getRoot());
-            return new ExprTree(this.getRoot());
-        }
-
-
-    }
-    return this;
+public Person[] generateTabPersons() {
+   Person[] persons = new Person[group_size];
+   for (int i = 0; i < group_size; i++) {
+      int personID = i + 1;
+      persons[i] = new Person(personID);
+   }
+   for (Spending aSpending : spendings) {
+      int debitedPerson = aSpending.get_paid_by()
+      int[] chargedPerson = aSpending.get_paid_for();
+      int chargedPersons = chargedPerson.length;
+      double spendingAmount = aSpending.get_amount();
+  
+      for (int person : chargedPerson) { 
+         double fixedCharge = aSpending.get_fixed_charges(person);
+         spendingAmount -= fixedCharge;
+      } 
+      
+      for (int person : chargedPerson) {
+         persons[person - 1].balanceAdd(spendingAmount / chargedPersons);
+      }
+  
+      persons[debitedPerson - 1].balanceSub(spendingAmount);
+  }
+  return persons;
 }
 \end{lstlisting}
-
 
 
 
